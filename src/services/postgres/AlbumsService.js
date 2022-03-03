@@ -37,7 +37,7 @@ class AlbumsService {
       throw new NotFoundError('Album tidak ditemukan');
     }
 
-    return (await result).rows.map(mapDBToModel)[0];
+    return result.rows.map(mapDBToModel)[0];
   }
 
   async editAlbumById(id, { name, year }) {
@@ -63,6 +63,28 @@ class AlbumsService {
 
     if (!result.rows.length) {
       throw new NotFoundError('Album gagal dihapus. Id tidak ditemukan');
+    }
+  }
+
+  async addCoverAlbum(id, cover) {
+    const query = {
+      text: 'UPDATE albums SET "coverUrl" = $2 where id = $1',
+      values: [id, cover],
+    };
+
+    const result = await this._pool.query(query);
+    return result.rows[0];
+  }
+
+  async checkIfAlbumExist(id) {
+    const query = {
+      text: 'SELECT * FROM albums WHERE id = $1',
+      values: [id],
+    };
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Album tidak ditemukan');
     }
   }
 }
